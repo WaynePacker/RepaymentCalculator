@@ -107,6 +107,9 @@ function switchSection(section) {
         toggleMobileNav();
     }
     
+    // Update page title for better SEO and accessibility
+    updatePageTitle(section);
+    
     // Track with gtag
     gtag('event', 'view_section', {
         'section_name': section
@@ -122,6 +125,15 @@ function switchSection(section) {
     } else if (section === 'savings-planner') {
         calculateAndDrawSavingsChart();
     }
+}
+
+function updatePageTitle(section) {
+    const sectionTitles = {
+        'loans-compare': 'Loans Compare - Financial Manager',
+        'expenses-manager': 'Expenses Manager - Financial Manager',
+        'savings-planner': 'Savings Planner - Financial Manager'
+    };
+    document.title = sectionTitles[section] || 'Financial Manager';
 }
 
 function toggleMobileNav() {

@@ -3,7 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Manager</title>
+    <meta name="description" content="Free online financial calculator tool. Compare loan repayment scenarios, manage expenses, and plan savings goals with visual charts and detailed projections.">
+    <meta name="keywords" content="financial calculator, loan calculator, expense tracker, savings planner, financial planning, budget calculator">
+    <meta name="author" content="Financial Manager">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Financial Manager - Free Loan, Expense & Savings Calculator">
+    <meta property="og:description" content="Compare loans, track expenses, and plan savings goals with interactive charts and projections. Multi-currency support.">
+    <meta property="og:url" content="https://yoursite.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Financial Manager - Free Financial Calculator">
+    <meta name="twitter:description" content="Compare loans, track expenses, and plan savings goals with visual charts.">
+    <link rel="canonical" href="https://yoursite.com">
+    <title>Financial Manager - Free Loan, Expense & Savings Calculator</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -16,14 +29,32 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-LKX5LX2N56');
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Financial Manager",
+      "description": "Free online financial calculator for comparing loans, managing expenses, and planning savings goals",
+      "url": "https://yoursite.com",
+      "applicationCategory": "FinanceApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "screenshot": "https://yoursite.com/screenshot.png"
+    }
     </script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Top Bar -->
-    <div class="top-bar">
+    <div class="top-bar" role="banner">
         <div class="top-bar-left">
             <button id="hamburger-menu" class="hamburger-menu" onclick="toggleMobileNav()">
                 <span></span>
@@ -73,7 +104,7 @@
     <div class="nav-overlay" id="nav-overlay" onclick="toggleMobileNav()"></div>
 
     <!-- Main Content Area -->
-    <main class="main-content">
+    <main class="main-content" id="main-content" role="main">
         <!-- Loans Compare Section -->
         <section id="loans-compare" class="content-section active">
             <div class="info-block">
