@@ -234,6 +234,17 @@ input[type="text"] {
     min-width: 180px;
 }
 
+select {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    min-width: 150px;
+}
+
 /* Buttons */
 button {
     padding: 0.5rem 1rem;
@@ -282,6 +293,35 @@ button:hover {
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+}
+
+.loan-item label, .income-item label, .expense-item label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.loan-item input, .income-item input, .expense-item input {
+    margin-top: 0.25rem;
+}
+
+/* Savings Goals */
+.savings-goal-list {
+    margin-bottom: 1rem;
+}
+
+.savings-goal-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .loan-item label, .income-item label, .expense-item label {
@@ -409,11 +449,16 @@ th {
         min-width: unset;
     }
 
+    select {
+        width: 100%;
+        min-width: unset;
+    }
+
     button {
         width: 100%;
     }
 
-    .loan-item, .income-item, .expense-item {
+    .loan-item, .income-item, .expense-item, .savings-goal-item {
         flex-direction: column;
         gap: 0.5rem;
     }
@@ -426,8 +471,17 @@ th {
         width: 100%;
     }
 
-    .loan-item button, .income-item button, .expense-item button {
+    .loan-item button, .income-item button, .expense-item button, .savings-goal-item button {
         width: 100%;
+    }
+
+    .savings-goal-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .savings-goal-item > div {
+        grid-template-columns: 1fr !important;
     }
 
     .chart-container {

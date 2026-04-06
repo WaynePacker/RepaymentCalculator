@@ -14,6 +14,9 @@ let appState = {
             { id: 1, label: 'Rent', amount: 1500 }
         ]
     },
+    savings: [
+        { id: 1, name: 'Vacation', goalAmount: 5000, contributionAmount: 200, frequency: 'monthly', interest: 2, interestType: 'yearly' }
+    ],
     settings: {
         deposit: 2000,
         interest: 7.5,
@@ -42,9 +45,10 @@ function initializeApp() {
     // Wire up loan inputs to app state
     wireUpLoanInputs();
     
-    // Initialize both sections
+    // Initialize all sections
     renderLoans();
     renderExpenses();
+    renderSavingsGoals();
     
     // Load default section
     switchSection('loans-compare');
@@ -57,7 +61,9 @@ function changeCurrency(currency) {
     appState.settings.currency = currency;
     renderLoans();
     renderExpenses();
+    renderSavingsGoals();
     calculateAndDrawChart();
+    calculateAndDrawSavingsChart();
 }
 
 function formatCurrency(amount) {
@@ -113,6 +119,8 @@ function switchSection(section) {
         calculateAndDrawChart();
     } else if (section === 'expenses-manager') {
         updateExpensesSummary();
+    } else if (section === 'savings-planner') {
+        calculateAndDrawSavingsChart();
     }
 }
 
@@ -450,6 +458,243 @@ function updateExpensesSummary() {
 }
 
 // ============================================
+// SAVINGS PLANNER SECTION
+// ============================================
+function addSavingsGoal() {
+    const name = document.getElementById('goal-name');
+    const goalAmount = document.getElementById('goal-amount');
+    const contributionAmount = document.getElementById('contribution-amount');
+    const frequency = document.getElementById('contribution-frequency');
+    const interest = document.getElementById('savings-interest');
+    const interestType = document.getElementById('interest-type');
+    
+    if (!validateInput(name.value, 'label') || !validateInput(goalAmount.value, 'amount') || !validateInput(contributionAmount.value, 'amount')) {
+        alert('Please fill in goal name, goal amount, and contribution amount (all non-negative, non-empty).');
+        return;
+    }
+    
+    const newId = appState.savings.length > 0 ? Math.max(...appState.savings.map(s => s.id)) + 1 : 1;
+    
+    appState.savings.push({
+        id: newId,
+        name: name.value,
+        goalAmount: Number(goalAmount.value),
+        contributionAmount: Number(contributionAmount.value),
+        frequency: frequency.value,
+        interest: Number(interest.value) || 0,
+        interestType: interestType.value
+    });
+    
+    name.value = '';
+    goalAmount.value = '';
+    contributionAmount.value = '';
+    interest.value = '';
+    
+    renderSavingsGoals();
+    calculateAndDrawSavingsChart();
+}
+
+function removeSavingsGoal(id) {
+    appState.savings = appState.savings.filter(s => s.id !== id);
+    renderSavingsGoals();
+    calculateAndDrawSavingsChart();
+}
+
+function updateSavingsGoal(id, field, value) {
+    const goal = appState.savings.find(g => g.id === id);
+    if (!goal) return;
+    
+    // Convert to appropriate type
+    if (field === 'name') {
+        goal.name = value;
+    } else if (field === 'goalAmount' || field === 'contributionAmount' || field === 'interest') {
+        const numValue = parseFloat(value) || 0;
+        if (numValue < 0) return; // Prevent negative values
+        goal[field] = numValue;
+    } else if (field === 'frequency' || field === 'interestType') {
+        goal[field] = value;
+    }
+    
+    // Trigger recalculation and re-render
+    calculateAndDrawSavingsChart();
+}
+
+function renderSavingsGoals() {
+    const goalsListEl = document.getElementById('savings-goal-list');
+    if (!goalsListEl) return;
+    
+    goalsListEl.innerHTML = '';
+    appState.savings.forEach(goal => {
+        const div = document.createElement('div');
+        div.className = 'savings-goal-item';
+        div.innerHTML = `
+            <div style="flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                <label style="display: flex; flex-direction: column; font-weight: 600; font-size: 0.9rem;">
+                    Goal Name
+                    <input type="text" value="${goal.name}" onchange="updateSavingsGoal(${goal.id}, 'name', this.value)" style="margin-top: 0.25rem; width: 100%;">
+                </label>
+                <label style="display: flex; flex-direction: column; font-weight: 600; font-size: 0.9rem;">
+                    Goal Amount
+                    <input type="number" value="${goal.goalAmount}" onchange="updateSavingsGoal(${goal.id}, 'goalAmount', this.value)" style="margin-top: 0.25rem; width: 100%;">
+                </label>
+                <label style="display: flex; flex-direction: column; font-weight: 600; font-size: 0.9rem;">
+                    Contribution Amount
+                    <input type="number" value="${goal.contributionAmount}" onchange="updateSavingsGoal(${goal.id}, 'contributionAmount', this.value)" style="margin-top: 0.25rem; width: 100%;">
+                </label>
+                <label style="display: flex; flex-direction: column; font-weight: 600; font-size: 0.9rem;">
+                    Frequency
+                    <select onchange="updateSavingsGoal(${goal.id}, 'frequency', this.value)" style="margin-top: 0.25rem; width: 100%;">
+                        <option value="weekly" ${goal.frequency === 'weekly' ? 'selected' : ''}>Weekly</option>
+                        <option value="monthly" ${goal.frequency === 'monthly' ? 'selected' : ''}>Monthly</option>
+                        <option value="yearly" ${goal.frequency === 'yearly' ? 'selected' : ''}>Yearly</option>
+                    </select>
+                </label>
+                <label style="display: flex; flex-direction: column; font-weight: 600; font-size: 0.9rem;">
+                    Interest Rate (%)
+                    <input type="number" value="${goal.interest}" onchange="updateSavingsGoal(${goal.id}, 'interest', this.value)" style="margin-top: 0.25rem; width: 100%;" min="0" max="100" step="0.1">
+                </label>
+                <label style="display: flex; flex-direction: column; font-weight: 600; font-size: 0.9rem;">
+                    Interest Type
+                    <select onchange="updateSavingsGoal(${goal.id}, 'interestType', this.value)" style="margin-top: 0.25rem; width: 100%;">
+                        <option value="monthly" ${goal.interestType === 'monthly' ? 'selected' : ''}>Monthly</option>
+                        <option value="yearly" ${goal.interestType === 'yearly' ? 'selected' : ''}>Yearly</option>
+                    </select>
+                </label>
+            </div>
+            <button class="remove-btn" onclick="removeSavingsGoal(${goal.id})" style="margin-top: 0.5rem;">Remove</button>
+        `;
+        goalsListEl.appendChild(div);
+    });
+}
+
+function calculateAndDrawSavingsChart() {
+    if (currentSection !== 'savings-planner') return;
+    
+    if (appState.savings.length === 0) {
+        document.getElementById('savings-summary-panel').innerHTML = '<p style="color: #999; font-style: italic;">Add a savings goal to see projections</p>';
+        return;
+    }
+    
+    let maxMonths = 0;
+    let summaryHTML = `
+        <h3>Savings Projection Summary</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Goal</th>
+                    <th>Time to Goal</th>
+                    <th>Total Contributed</th>
+                    <th>Total Interest Earned</th>
+                    <th>Final Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    const datasets = appState.savings.map((goal, index) => {
+        // Convert contribution frequency to monthly
+        let monthlyContribution = 0;
+        if (goal.frequency === 'weekly') {
+            monthlyContribution = goal.contributionAmount * 52 / 12;
+        } else if (goal.frequency === 'monthly') {
+            monthlyContribution = goal.contributionAmount;
+        } else if (goal.frequency === 'yearly') {
+            monthlyContribution = goal.contributionAmount / 12;
+        }
+        
+        // Convert interest rate
+        let monthlyRate = 0;
+        if (goal.interest > 0) {
+            if (goal.interestType === 'yearly') {
+                monthlyRate = (goal.interest / 100) / 12;
+            } else if (goal.interestType === 'monthly') {
+                monthlyRate = goal.interest / 100;
+            }
+        }
+        
+        let balance = 0;
+        const dataPoints = [balance];
+        let months = 0;
+        let totalInterestEarned = 0;
+        let totalContributed = 0;
+        
+        // Calculate until goal is reached (max 1000 months = ~83 years)
+        while (balance < goal.goalAmount && months < 1000) {
+            // Add contribution
+            balance += monthlyContribution;
+            totalContributed += monthlyContribution;
+            
+            // Add interest on current balance
+            const interestThisMonth = balance * monthlyRate;
+            balance += interestThisMonth;
+            totalInterestEarned += interestThisMonth;
+            
+            dataPoints.push(balance);
+            months++;
+        }
+        
+        if (months > maxMonths) maxMonths = months;
+        
+        const yearsToGoal = (months / 12).toFixed(1);
+        
+        summaryHTML += `
+            <tr>
+                <td><strong>${goal.name}</strong></td>
+                <td>${yearsToGoal} years (${months} months)</td>
+                <td>${formatCurrency(totalContributed)}</td>
+                <td>${formatCurrency(totalInterestEarned)}</td>
+                <td><strong>${formatCurrency(balance)}</strong></td>
+            </tr>
+        `;
+        
+        return {
+            label: `${goal.name} (Goal: ${formatCurrency(goal.goalAmount)})`,
+            data: dataPoints,
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.1,
+            fill: false
+        };
+    });
+    
+    summaryHTML += `</tbody></table>`;
+    document.getElementById('savings-summary-panel').innerHTML = summaryHTML;
+    
+    // Generate labels in years
+    const labels = [];
+    for (let i = 0; i <= maxMonths; i++) {
+        labels.push((i / 12).toFixed(1));
+    }
+    
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    
+    const ctx = document.getElementById('savingsChart');
+    if (ctx) {
+        chartInstance = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Time (Years)', font: { weight: 'bold' } },
+                        ticks: { maxTicksLimit: 15 }
+                    },
+                    y: {
+                        title: { display: true, text: 'Savings Balance (' + appState.settings.currency + ')', font: { weight: 'bold' } },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+}
+
+// ============================================
 // INPUT VALIDATION
 // ============================================
 function validateInput(value, type) {
@@ -508,6 +753,7 @@ function importData(event) {
             // Re-render all
             renderLoans();
             renderExpenses();
+            renderSavingsGoals();
             updateExpensesSummary();
             
             // Switch to loans section after import
