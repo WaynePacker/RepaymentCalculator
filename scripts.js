@@ -179,7 +179,7 @@ function renderLoans() {
                 <input type="number" value="${loan.amount}" 
                        oninput="updateLoanAmount(${loan.id}, this.value)">
             </label>
-            <button class="remove-btn" onclick="removeLoan(${loan.id})">Remove</button>
+            <button class="remove-btn" onclick="removeLoan(${loan.id})"><i class="fas fa-trash"></i> Remove</button>
         `;
         loanListEl.appendChild(div);
     });
@@ -423,7 +423,7 @@ function renderExpenses() {
             <label>${income.source}
                 <span style="font-weight: normal;">${formatCurrency(income.amount)}</span>
             </label>
-            <button class="remove-btn" onclick="removeIncomeSource(${income.id})">Remove</button>
+            <button class="remove-btn" onclick="removeIncomeSource(${income.id})"><i class="fas fa-trash"></i> Remove</button>
         `;
         incomeListEl.appendChild(div);
     });
@@ -438,7 +438,7 @@ function renderExpenses() {
             <label>${expense.label}
                 <span style="font-weight: normal;">${formatCurrency(expense.amount)}</span>
             </label>
-            <button class="remove-btn" onclick="removeExpense(${expense.id})">Remove</button>
+            <button class="remove-btn" onclick="removeExpense(${expense.id})"><i class="fas fa-trash"></i> Remove</button>
         `;
         expenseListEl.appendChild(div);
     });
@@ -573,7 +573,7 @@ function renderSavingsGoals() {
                     </select>
                 </label>
             </div>
-            <button class="remove-btn" onclick="removeSavingsGoal(${goal.id})" style="margin-top: 0.5rem;">Remove</button>
+            <button class="remove-btn" onclick="removeSavingsGoal(${goal.id})" style="margin-top: 0.5rem; width: 100%;"><i class="fas fa-trash"></i> Remove</button>
         `;
         goalsListEl.appendChild(div);
     });

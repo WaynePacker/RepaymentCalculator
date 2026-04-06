@@ -22,6 +22,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="site.webmanifest">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LKX5LX2N56"></script>
@@ -47,184 +52,226 @@
       "screenshot": "https://yoursite.com/screenshot.png"
     }
     </script>
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- Skip Navigation Link for Accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+<body class="bg-light">
+    <a href="#main-content" class="visually-hidden-focusable">Skip to main content</a>
     
-    <!-- Top Bar -->
-    <div class="top-bar" role="banner">
-        <div class="top-bar-left">
-            <button id="hamburger-menu" class="hamburger-menu" onclick="toggleMobileNav()">
-                <span></span>
-                <span></span>
-                <span></span>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-mint sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold fs-5" href="#"><i class="fas fa-briefcase"></i> Financial Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-            <h2>Financial Manager</h2>
-        </div>
-        <div class="top-bar-right">
-            <div class="currency-selector">
-                <label for="currency-select">Currency:</label>
-                <select id="currency-select" onchange="changeCurrency(this.value)">
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="JPY">JPY (¥)</option>
-                    <option value="AUD">AUD (A$)</option>
-                    <option value="CAD">CAD (C$)</option>
-                    <option value="CHF">CHF (Fr)</option>
-                    <option value="CNY">CNY (¥)</option>
-                    <option value="INR">INR (₹)</option>
-                    <option value="MXN">MXN ($)</option>
-                </select>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex gap-3 align-items-center flex-wrap">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="currency-select" class="form-label mb-0 fw-semibold">Currency:</label>
+                        <select id="currency-select" class="form-select form-select-sm" style="width: auto;" onchange="changeCurrency(this.value)">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                            <option value="JPY">JPY (¥)</option>
+                            <option value="AUD">AUD (A$)</option>
+                            <option value="CAD">CAD (C$)</option>
+                            <option value="CHF">CHF (Fr)</option>
+                            <option value="CNY">CNY (¥)</option>
+                            <option value="INR">INR (₹)</option>
+                            <option value="MXN">MXN ($)</option>
+                        </select>
+                    </div>
+                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+                    <button class="btn btn-sm btn-outline-teal" onclick="document.getElementById('import-file').click()"><i class="fas fa-download"></i> Import</button>
+                    <button class="btn btn-sm btn-outline-teal" onclick="exportData()"><i class="fas fa-upload"></i> Export</button>
+                </div>
             </div>
-            <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
-            <button class="secondary-btn" onclick="document.getElementById('import-file').click()">Import JSON</button>
-            <button class="secondary-btn" onclick="exportData()">Export JSON</button>
-        </div>
-    </div>
-
-    <!-- Left Navigation -->
-    <nav class="left-nav" id="left-nav">
-        <div class="nav-items">
-            <button class="nav-item active" onclick="switchSection('loans-compare')">
-                📊 Loans Compare
-            </button>
-            <button class="nav-item" onclick="switchSection('expenses-manager')">
-                💰 Expenses Manager
-            </button>
-            <button class="nav-item" onclick="switchSection('savings-planner')">
-                🏦 Savings Planner
-            </button>
         </div>
     </nav>
 
-    <!-- Navigation Overlay (Mobile) -->
-    <div class="nav-overlay" id="nav-overlay" onclick="toggleMobileNav()"></div>
-
-    <!-- Main Content Area -->
-    <main class="main-content" id="main-content" role="main">
-        <!-- Loans Compare Section -->
-        <section id="loans-compare" class="content-section active">
-            <div class="info-block">
-                <h2>📊 Loans Compare</h2>
-                <p>Compare and visualize different loan repayment scenarios. Adjust your deposit amount, interest rate, and monthly payment to see how quickly you can pay off various loan amounts.</p>
-            </div>
-            <div class="control-panel">
-                <h3>Global Settings</h3>
-                <div class="input-group">
-                    <label>Deposit Amount
-                        <input type="number" id="deposit" value="2000" min="0">
-                    </label>
-                    <label>Annual Interest Rate (%)
-                        <input type="number" id="interest" value="7.5" step="0.1" min="0">
-                    </label>
-                    <label>Monthly Payment
-                        <input type="number" id="payment" value="800" min="0">
-                    </label>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <nav class="col-lg-2 p-4 min-vh-100" id="sidebar-nav">
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action border-0 nav-link-btn active" 
+                            onclick="switchSection('loans-compare')" data-section="loans-compare">
+                        <i class="fas fa-chart-bar"></i> Loans Compare
+                    </button>
+                    <button class="list-group-item list-group-item-action border-0 nav-link-btn" 
+                            onclick="switchSection('expenses-manager')" data-section="expenses-manager">
+                        <i class="fas fa-money-bill-1"></i> Expenses Manager
+                    </button>
+                    <button class="list-group-item list-group-item-action border-0 nav-link-btn" 
+                            onclick="switchSection('savings-planner')" data-section="savings-planner">
+                        <i class="fas fa-building-columns"></i> Savings Planner
+                    </button>
                 </div>
+            </nav>
 
-                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #dee2e6;">
+            <!-- Main Content -->
+            <main class="col-lg-10 p-4" id="main-content" role="main">
+                <!-- Loans Compare Section -->
+                <section id="loans-compare" class="content-section active">
+                    <div class="alert alert-info bg-mint border-0 mb-4" role="alert">
+                        <h2 class="alert-heading fw-bold"><i class="fas fa-chart-bar"></i> Loans Compare</h2>
+                        <p class="mb-0">Compare and visualize different loan repayment scenarios. Adjust your deposit amount, interest rate, and monthly payment to see how quickly you can pay off various loan amounts.</p>
+                    </div>
 
-                <h3>Loan Scenarios</h3>
-                <div class="loan-list" id="loan-list"></div>
-                <button id="add-loan-btn">+ Add New Loan Amount</button>
-            </div>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title text-teal fw-bold mb-4">Global Settings</h3>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="deposit" class="form-label fw-semibold">Deposit Amount</label>
+                                    <input type="number" id="deposit" class="form-control form-control-lg" value="2000" min="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="interest" class="form-label fw-semibold">Annual Interest Rate (%)</label>
+                                    <input type="number" id="interest" class="form-control form-control-lg" value="7.5" step="0.1" min="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="payment" class="form-label fw-semibold">Monthly Payment</label>
+                                    <input type="number" id="payment" class="form-control form-control-lg" value="800" min="0">
+                                </div>
+                            </div>
 
-            <div class="chart-container">
-                <canvas id="loanChart"></canvas>
-            </div>
+                            <hr class="my-4">
 
-            <div class="summary-panel" id="summary-panel"></div>
-        </section>
+                            <h3 class="card-title text-teal fw-bold mb-3">Loan Scenarios</h3>
+                            <div id="loan-list" class="mb-3"></div>
+                            <button id="add-loan-btn" class="btn btn-lg btn-mint fw-semibold">+ Add New Loan</button>
+                        </div>
+                    </div>
 
-        <!-- Expenses Manager Section -->
-        <section id="expenses-manager" class="content-section">
-            <div class="info-block">
-                <h2>💰 Expenses Manager</h2>
-                <p>Track your income sources and expenses to see your financial overview. Add multiple income streams and expense categories to get a clear picture of your net income.</p>
-            </div>
-            <div class="control-panel">
-                <h3>Income Sources</h3>
-                <div class="input-group">
-                    <label>Source Name
-                        <input type="text" id="income-source" placeholder="e.g., Salary">
-                    </label>
-                    <label>Amount
-                        <input type="number" id="income-amount" placeholder="0" min="0" step="0.01">
-                    </label>
-                    <button onclick="addIncomeSource()" style="align-self: flex-end; margin-top: auto;">+ Add Income</button>
-                </div>
-                <div class="income-list" id="income-list"></div>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 400px; position: relative;">
+                                <canvas id="loanChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
 
-                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #dee2e6;">
+                    <div id="summary-panel"></div>
+                </section>
 
-                <h3>Expenses</h3>
-                <div class="input-group">
-                    <label>Expense Label
-                        <input type="text" id="expense-label" placeholder="e.g., Rent">
-                    </label>
-                    <label>Amount
-                        <input type="number" id="expense-amount" placeholder="0" min="0" step="0.01">
-                    </label>
-                    <button onclick="addExpense()" style="align-self: flex-end; margin-top: auto;">+ Add Expense</button>
-                </div>
-                <div class="expense-list" id="expense-list"></div>
-            </div>
+                <!-- Expenses Manager Section -->
+                <section id="expenses-manager" class="content-section">
+                    <div class="alert alert-info bg-mint border-0 mb-4" role="alert">
+                        <h2 class="alert-heading fw-bold"><i class="fas fa-money-bill-1"></i> Expenses Manager</h2>
+                        <p class="mb-0">Track your income sources and expenses to see your financial overview. Add multiple income streams and expense categories to get a clear picture of your net income.</p>
+                    </div>
 
-            <div class="summary-panel" id="expenses-summary-panel"></div>
-        </section>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title text-teal fw-bold mb-4">Income Sources</h3>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="income-source" class="form-label fw-semibold">Source Name</label>
+                                    <input type="text" id="income-source" class="form-control form-control-lg" placeholder="e.g., Salary">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="income-amount" class="form-label fw-semibold">Amount</label>
+                                    <input type="number" id="income-amount" class="form-control form-control-lg" placeholder="0" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-lg btn-mint w-100 fw-semibold" onclick="addIncomeSource()">Add</button>
+                                </div>
+                            </div>
+                            <div id="income-list" class="mb-3"></div>
 
-        <!-- Savings Planner Section -->
-        <section id="savings-planner" class="content-section">
-            <div class="info-block">
-                <h2>🏦 Savings Planner</h2>
-                <p>Calculate how long it will take to reach your savings goals. Set your goal amount, contribution frequency, and optional interest rate to visualize your savings growth over time.</p>
-            </div>
-            <div class="control-panel">
-                <h3>Add Savings Goal</h3>
-                <div class="input-group">
-                    <label>Goal Name
-                        <input type="text" id="goal-name" placeholder="e.g., Vacation">
-                    </label>
-                    <label>Goal Amount
-                        <input type="number" id="goal-amount" placeholder="0" min="0" step="0.01">
-                    </label>
-                    <label>Contribution Amount
-                        <input type="number" id="contribution-amount" placeholder="0" min="0" step="0.01">
-                    </label>
-                </div>
-                <div class="input-group">
-                    <label>Contribution Frequency
-                        <select id="contribution-frequency">
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="yearly">Yearly</option>
-                        </select>
-                    </label>
-                    <label>Interest Rate (% - optional)
-                        <input type="number" id="savings-interest" placeholder="0" min="0" step="0.1">
-                    </label>
-                    <label>Interest Compounding
-                        <select id="interest-type">
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="yearly">Yearly</option>
-                        </select>
-                    </label>
-                    <button onclick="addSavingsGoal()" style="align-self: flex-end; margin-top: auto;">+ Add Goal</button>
-                </div>
-                <div class="savings-goal-list" id="savings-goal-list"></div>
-            </div>
+                            <hr class="my-4">
 
-            <div class="chart-container">
-                <canvas id="savingsChart"></canvas>
-            </div>
+                            <h3 class="card-title text-teal fw-bold mb-3">Expenses</h3>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="expense-label" class="form-label fw-semibold">Expense Label</label>
+                                    <input type="text" id="expense-label" class="form-control form-control-lg" placeholder="e.g., Rent">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="expense-amount" class="form-label fw-semibold">Amount</label>
+                                    <input type="number" id="expense-amount" class="form-control form-control-lg" placeholder="0" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-lg btn-mint w-100 fw-semibold" onclick="addExpense()">Add</button>
+                                </div>
+                            </div>
+                            <div id="expense-list" class="mb-3"></div>
+                        </div>
+                    </div>
 
-            <div class="summary-panel" id="savings-summary-panel"></div>
-        </section>
-    </main>
+                    <div id="expenses-summary-panel"></div>
+                </section>
 
+                <!-- Savings Planner Section -->
+                <section id="savings-planner" class="content-section">
+                    <div class="alert alert-info bg-mint border-0 mb-4" role="alert">
+                        <h2 class="alert-heading fw-bold"><i class="fas fa-building-columns"></i> Savings Planner</h2>
+                        <p class="mb-0">Calculate how long it will take to reach your savings goals. Set your goal amount, contribution frequency, and optional interest rate to visualize your savings growth over time.</p>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title text-teal fw-bold mb-4">Add Savings Goal</h3>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label for="goal-name" class="form-label fw-semibold">Goal Name</label>
+                                    <input type="text" id="goal-name" class="form-control form-control-lg" placeholder="e.g., Vacation">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="goal-amount" class="form-label fw-semibold">Goal Amount</label>
+                                    <input type="number" id="goal-amount" class="form-control form-control-lg" placeholder="0" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="contribution-amount" class="form-label fw-semibold">Contribution Amount</label>
+                                    <input type="number" id="contribution-amount" class="form-control form-control-lg" placeholder="0" min="0" step="0.01">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-3">
+                                    <label for="contribution-frequency" class="form-label fw-semibold">Frequency</label>
+                                    <select id="contribution-frequency" class="form-select form-select-lg">
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly" selected>Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="savings-interest" class="form-label fw-semibold">Interest Rate (%)</label>
+                                    <input type="number" id="savings-interest" class="form-control form-control-lg" placeholder="0" min="0" step="0.1">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="interest-type" class="form-label fw-semibold">Compounding</label>
+                                    <select id="interest-type" class="form-select form-select-lg">
+                                        <option value="monthly" selected>Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button class="btn btn-lg btn-mint w-100 fw-semibold" onclick="addSavingsGoal()">Add Goal</button>
+                                </div>
+                            </div>
+
+                            <div id="savings-goal-list" class="mb-3"></div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 400px; position: relative;">
+                                <canvas id="savingsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="savings-summary-panel"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
