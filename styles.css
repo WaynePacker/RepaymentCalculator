@@ -1,0 +1,440 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --secondary-color: #6c757d;
+    --secondary-hover: #5c636a;
+    --danger-color: #dc3545;
+    --danger-hover: #bb2d3b;
+    --border-color: #dee2e6;
+    --bg-light: #f8f9fa;
+    --text-color: #333;
+    --nav-width: 200px;
+    --top-bar-height: 60px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: var(--text-color);
+    line-height: 1.5;
+    background-color: #fff;
+}
+
+/* Top Bar Styles */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--top-bar-height);
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.top-bar-left h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.currency-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.currency-selector label {
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.currency-selector select {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    gap: 5px;
+}
+
+.hamburger-menu span {
+    width: 25px;
+    height: 3px;
+    background: var(--text-color);
+    border-radius: 2px;
+}
+
+/* Left Navigation */
+.left-nav {
+    position: fixed;
+    left: 0;
+    top: var(--top-bar-height);
+    bottom: 0;
+    width: var(--nav-width);
+    background: var(--bg-light);
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    z-index: 99;
+}
+
+.nav-items {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-color);
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-item:hover {
+    background-color: #e9ecef;
+}
+
+.nav-item.active {
+    background-color: #e3f2fd;
+    border-left-color: var(--primary-color);
+    border-left-width: 5px;
+    color: var(--primary-color);
+    font-weight: 700;
+    box-shadow: inset 0 2px 4px rgba(13, 110, 253, 0.1);
+}
+
+/* Navigation Overlay (Mobile) */
+.nav-overlay {
+    display: none;
+    position: fixed;
+    top: var(--top-bar-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+}
+
+/* Main Content */
+.main-content {
+    margin-top: var(--top-bar-height);
+    margin-left: var(--nav-width);
+    padding: 2rem;
+    max-width: 1000px;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+/* Info Block */
+.info-block {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-block h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+}
+
+.info-block p {
+    margin: 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Control Panel & Summary Panel */
+.control-panel, .summary-panel {
+    background: var(--bg-light);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.control-panel h3, .summary-panel h3 {
+    margin-top: 0;
+}
+
+/* Form Inputs */
+.input-group {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+input[type="number"], input[type="text"] {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    min-width: 150px;
+}
+
+input[type="text"] {
+    min-width: 180px;
+}
+
+/* Buttons */
+button {
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: var(--primary-hover);
+}
+
+.secondary-btn {
+    background: var(--secondary-color);
+}
+
+.secondary-btn:hover {
+    background: var(--secondary-hover);
+}
+
+.remove-btn {
+    background: var(--danger-color);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.remove-btn:hover {
+    background: var(--danger-hover);
+}
+
+/* Loan Items */
+.loan-list, .income-list, .expense-list {
+    margin-bottom: 1rem;
+}
+
+.loan-item, .income-item, .expense-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+    align-items: flex-end;
+    padding: 0.8rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.loan-item label, .income-item label, .expense-item label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.loan-item input, .income-item input, .expense-item input {
+    margin-top: 0.25rem;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 50vh;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
+
+.danger-text {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+/* Summary Stats */
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-box {
+    background: white;
+    padding: 1.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    :root {
+        --nav-width: 0;
+    }
+
+    .hamburger-menu {
+        display: flex;
+    }
+
+    .left-nav {
+        position: fixed;
+        width: 250px;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 101;
+    }
+
+    .left-nav.active {
+        transform: translateX(0);
+    }
+
+    .nav-overlay {
+        display: block;
+    }
+
+    .nav-overlay.active {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .input-group {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .input-group label {
+        width: 100%;
+    }
+
+    input[type="number"], input[type="text"] {
+        width: 100%;
+        min-width: unset;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .loan-item, .income-item, .expense-item {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .loan-item label, .income-item label, .expense-item label {
+        width: 100%;
+    }
+
+    .loan-item input, .income-item input, .expense-item input {
+        width: 100%;
+    }
+
+    .loan-item button, .income-item button, .expense-item button {
+        width: 100%;
+    }
+
+    .chart-container {
+        height: 40vh;
+    }
+
+    .summary-stats {
+        grid-template-columns: 1fr;
+    }
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan Repayment Visualizer</title>
+    <title>Financial Manager</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -19,381 +19,130 @@
 
     gtag('config', 'G-LKX5LX2N56');
     </script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            color: #333;
-            line-height: 1.5;
-        }
-        .control-panel, .summary-panel {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            margin-bottom: 1.5rem;
-        }
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .input-group {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-        .input-group label {
-            display: flex;
-            flex-direction: column;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        input[type="number"] {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        .loan-list { margin-bottom: 1rem; }
-        .loan-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 0.5rem;
-            align-items: flex-end;
-        }
-        button {
-            padding: 0.5rem 1rem;
-            background: #0d6efd;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        button:hover { background: #0b5ed7; }
-        .secondary-btn {
-            background: #6c757d;
-        }
-        .secondary-btn:hover {
-            background: #5c636a;
-        }
-        .remove-btn { background: #dc3545; }
-        .remove-btn:hover { background: #bb2d3b; }
-        .chart-container {
-            position: relative;
-            height: 50vh;
-            width: 100%;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Table styling for the summary */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        th, td {
-            text-align: left;
-            padding: 0.75rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-        th {
-            background-color: #e9ecef;
-            font-weight: 600;
-        }
-        .danger-text { color: #dc3545; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <div class="header-actions">
-        <h2>Loan Repayment Visualizer</h2>
-        <div class="action-buttons">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button id="hamburger-menu" class="hamburger-menu" onclick="toggleMobileNav()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h2>Financial Manager</h2>
+        </div>
+        <div class="top-bar-right">
+            <div class="currency-selector">
+                <label for="currency-select">Currency:</label>
+                <select id="currency-select" onchange="changeCurrency(this.value)">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="JPY">JPY (¥)</option>
+                    <option value="AUD">AUD (A$)</option>
+                    <option value="CAD">CAD (C$)</option>
+                    <option value="CHF">CHF (Fr)</option>
+                    <option value="CNY">CNY (¥)</option>
+                    <option value="INR">INR (₹)</option>
+                    <option value="MXN">MXN ($)</option>
+                </select>
+            </div>
             <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             <button class="secondary-btn" onclick="document.getElementById('import-file').click()">Import JSON</button>
             <button class="secondary-btn" onclick="exportData()">Export JSON</button>
         </div>
     </div>
-    
-    <div class="control-panel">
-        <h3>Global Settings</h3>
-        <div class="input-group">
-            <label>Deposit Amount ($)
-                <input type="number" id="deposit" value="2000" min="0">
-            </label>
-            <label>Annual Interest Rate (%)
-                <input type="number" id="interest" value="7.5" step="0.1" min="0">
-            </label>
-            <label>Monthly Payment ($)
-                <input type="number" id="payment" value="800" min="0">
-            </label>
+
+    <!-- Left Navigation -->
+    <nav class="left-nav" id="left-nav">
+        <div class="nav-items">
+            <button class="nav-item active" onclick="switchSection('loans-compare')">
+                📊 Loans Compare
+            </button>
+            <button class="nav-item" onclick="switchSection('expenses-manager')">
+                💰 Expenses Manager
+            </button>
         </div>
+    </nav>
 
-        <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #dee2e6;">
+    <!-- Navigation Overlay (Mobile) -->
+    <div class="nav-overlay" id="nav-overlay" onclick="toggleMobileNav()"></div>
 
-        <h3>Loan Scenarios</h3>
-        <div class="loan-list" id="loan-list">
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Loans Compare Section -->
+        <section id="loans-compare" class="content-section active">
+            <div class="info-block">
+                <h2>📊 Loans Compare</h2>
+                <p>Compare and visualize different loan repayment scenarios. Adjust your deposit amount, interest rate, and monthly payment to see how quickly you can pay off various loan amounts.</p>
             </div>
-        <button id="add-loan-btn">+ Add New Loan Amount</button>
-    </div>
-
-    <div class="chart-container">
-        <canvas id="loanChart"></canvas>
-    </div>
-
-    <div class="summary-panel" id="summary-panel">
-        </div>
-
-    <script>
-        // State management
-        let loans = [
-            { id: 1, amount: 30000 },
-            { id: 2, amount: 45000 }
-        ];
-        let chartInstance = null;
-
-        // DOM Elements
-        const loanListEl = document.getElementById('loan-list');
-        const summaryPanelEl = document.getElementById('summary-panel');
-        const addBtn = document.getElementById('add-loan-btn');
-        const inputs = document.querySelectorAll('.control-panel input');
-
-        // Render the HTML for the dynamic loan list
-        function renderLoans() {
-            loanListEl.innerHTML = '';
-            loans.forEach((loan, index) => {
-                const div = document.createElement('div');
-                div.className = 'loan-item';
-                div.innerHTML = `
-                    <label>Loan ${index + 1} Amount ($)
-                        <input type="number" value="${loan.amount}" 
-                               oninput="updateLoanAmount(${loan.id}, this.value)">
+            <div class="control-panel">
+                <h3>Global Settings</h3>
+                <div class="input-group">
+                    <label>Deposit Amount
+                        <input type="number" id="deposit" value="2000" min="0">
                     </label>
-                    <button class="remove-btn" onclick="removeLoan(${loan.id})">Remove</button>
-                `;
-                loanListEl.appendChild(div);
-            });
-            calculateAndDrawChart();
-        }
+                    <label>Annual Interest Rate (%)
+                        <input type="number" id="interest" value="7.5" step="0.1" min="0">
+                    </label>
+                    <label>Monthly Payment
+                        <input type="number" id="payment" value="800" min="0">
+                    </label>
+                </div>
 
-        function updateLoanAmount(id, value) {
-            const loan = loans.find(l => l.id === id);
-            if (loan) {
-                loan.amount = Number(value);
-                calculateAndDrawChart();
-            }
-        }
+                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #dee2e6;">
 
-        function addLoan() {
-            const newId = loans.length > 0 ? Math.max(...loans.map(l => l.id)) + 1 : 1;
-            loans.push({ id: newId, amount: 50000 });
-            renderLoans();
-        }
+                <h3>Loan Scenarios</h3>
+                <div class="loan-list" id="loan-list"></div>
+                <button id="add-loan-btn">+ Add New Loan Amount</button>
+            </div>
 
-        function removeLoan(id) {
-            loans = loans.filter(l => l.id !== id);
-            renderLoans();
-        }
+            <div class="chart-container">
+                <canvas id="loanChart"></canvas>
+            </div>
 
-        // --- NEW: Export Data Logic ---
-        function exportData() {
-            const dataToExport = {
-                settings: {
-                    deposit: document.getElementById('deposit').value,
-                    interest: document.getElementById('interest').value,
-                    payment: document.getElementById('payment').value
-                },
-                loans: loans
-            };
+            <div class="summary-panel" id="summary-panel"></div>
+        </section>
 
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "loan_scenarios.json");
-            document.body.appendChild(downloadAnchorNode); // Required for Firefox
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
+        <!-- Expenses Manager Section -->
+        <section id="expenses-manager" class="content-section">
+            <div class="info-block">
+                <h2>💰 Expenses Manager</h2>
+                <p>Track your income sources and expenses to see your financial overview. Add multiple income streams and expense categories to get a clear picture of your net income.</p>
+            </div>
+            <div class="control-panel">
+                <h3>Income Sources</h3>
+                <div class="input-group">
+                    <label>Source Name
+                        <input type="text" id="income-source" placeholder="e.g., Salary">
+                    </label>
+                    <label>Amount
+                        <input type="number" id="income-amount" placeholder="0" min="0" step="0.01">
+                    </label>
+                    <button onclick="addIncomeSource()" style="align-self: flex-end; margin-top: auto;">+ Add Income</button>
+                </div>
+                <div class="income-list" id="income-list"></div>
 
-        // --- NEW: Import Data Logic ---
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #dee2e6;">
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    
-                    // Update Settings
-                    if (importedData.settings) {
-                        document.getElementById('deposit').value = importedData.settings.deposit || 0;
-                        document.getElementById('interest').value = importedData.settings.interest || 0;
-                        document.getElementById('payment').value = importedData.settings.payment || 0;
-                    }
-                    
-                    // Update Loans
-                    if (importedData.loans && Array.isArray(importedData.loans)) {
-                        loans = importedData.loans;
-                    }
+                <h3>Expenses</h3>
+                <div class="input-group">
+                    <label>Expense Label
+                        <input type="text" id="expense-label" placeholder="e.g., Rent">
+                    </label>
+                    <label>Amount
+                        <input type="number" id="expense-amount" placeholder="0" min="0" step="0.01">
+                    </label>
+                    <button onclick="addExpense()" style="align-self: flex-end; margin-top: auto;">+ Add Expense</button>
+                </div>
+                <div class="expense-list" id="expense-list"></div>
+            </div>
 
-                    // Reset the file input so you can import the same file again if needed
-                    event.target.value = ''; 
-                    
-                    renderLoans(); // Re-render UI and chart with new data
-                } catch (err) {
-                    alert("Error parsing JSON file. Please ensure it is a valid format.");
-                    console.error(err);
-                }
-            };
-            reader.readAsText(file);
-        }
+            <div class="summary-panel" id="expenses-summary-panel"></div>
+        </section>
+    </main>
 
-        // Core Math & Charting Logic
-        function calculateAndDrawChart() {
-            const deposit = Number(document.getElementById('deposit').value);
-            const annualRate = Number(document.getElementById('interest').value);
-            const monthlyRate = (annualRate / 100) / 12;
-            const payment = Number(document.getElementById('payment').value);
-
-            let maxMonths = 0;
-            
-            // Reformatting summary into a table for cleaner columns
-            let summaryHTML = `
-                <h3>Repayment Summary</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Scenario</th>
-                            <th>Time to Payoff</th>
-                            <th>Total Interest</th>
-                            <th>Total Amount Paid</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            const datasets = loans.map((loan, index) => {
-                let balance = loan.amount - deposit;
-                const startingPrincipal = balance > 0 ? balance : 0;
-                if (balance < 0) balance = 0; 
-                
-                const dataPoints = [balance];
-                let months = 0;
-                let totalInterest = 0; 
-
-                const isInfinite = balance > 0 && payment <= (balance * monthlyRate);
-
-                if (balance > 0 && !isInfinite) {
-                    while (balance > 0 && months < 600) { 
-                        const interestThisMonth = balance * monthlyRate;
-                        totalInterest += interestThisMonth; 
-                        
-                        balance += interestThisMonth; 
-                        balance -= payment;                 
-                        if (balance < 0) balance = 0;       
-                        
-                        dataPoints.push(balance);
-                        months++;
-                    }
-                    
-                    const formattedInterest = Math.round(totalInterest).toLocaleString();
-                    const totalPaid = Math.round(startingPrincipal + totalInterest).toLocaleString();
-                    const yearsToPayoff = (months / 12).toFixed(1);
-                    
-                    summaryHTML += `
-                        <tr>
-                            <td><strong>Loan ${index + 1} ($${loan.amount.toLocaleString()})</strong></td>
-                            <td>${yearsToPayoff} years</td>
-                            <td>$${formattedInterest}</td>
-                            <td><strong>$${totalPaid}</strong></td>
-                        </tr>`;
-
-                } else if (isInfinite) {
-                    for(let i = 0; i < 120; i++) {
-                        balance += (balance * monthlyRate) - payment;
-                        dataPoints.push(balance);
-                    }
-                    months = 120; 
-                    
-                    summaryHTML += `
-                        <tr>
-                            <td><strong>Loan ${index + 1} ($${loan.amount.toLocaleString()})</strong></td>
-                            <td colspan="3" class="danger-text">Monthly payment is too low to cover interest. Loan will never be paid off.</td>
-                        </tr>`;
-                } else {
-                    summaryHTML += `
-                        <tr>
-                            <td><strong>Loan ${index + 1} ($${loan.amount.toLocaleString()})</strong></td>
-                            <td>0 years</td>
-                            <td>$0</td>
-                            <td><strong>$0</strong> (Covered by deposit)</td>
-                        </tr>`;
-                }
-                
-                if (months > maxMonths) maxMonths = months;
-
-                return {
-                    label: `Loan ${index + 1} ($${loan.amount})`,
-                    data: dataPoints,
-                    borderWidth: 2,
-                    pointRadius: 0, 
-                    tension: 0.1    
-                };
-            });
-
-            summaryHTML += `</tbody></table>`;
-            summaryPanelEl.innerHTML = summaryHTML;
-
-            const labels = [];
-            for (let i = 0; i <= maxMonths; i++) {
-                labels.push((i / 12).toFixed(1)); 
-            }
-
-            if (chartInstance) {
-                chartInstance.destroy(); 
-            }
-
-            const ctx = document.getElementById('loanChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { labels: labels, datasets: datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    scales: {
-                        x: {
-                            title: { display: true, text: 'Time (Years)', font: { weight: 'bold' } },
-                            ticks: { maxTicksLimit: 15 }
-                        },
-                        y: {
-                            title: { display: true, text: 'Remaining Balance ($)', font: { weight: 'bold' } },
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Event Listeners
-        addBtn.addEventListener('click', addLoan);
-        inputs.forEach(input => {
-            input.addEventListener('input', calculateAndDrawChart);
-        });
-
-        // Initialize
-        renderLoans();
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
