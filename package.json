@@ -1,0 +1,15 @@
+{
+  "name": "repayment-calculator",
+  "version": "1.0.0",
+  "description": "Financial calculator with Tailwind CSS",
+  "scripts": {
+    "build": "tailwindcss -i ./input.css -o ./styles.css",
+    "dev": "tailwindcss -i ./input.css -o ./styles.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.2.2"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.2"
+  }
+}

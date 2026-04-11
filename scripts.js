@@ -21,6 +21,14 @@ let appState = {
       interestType: "yearly",
     },
   ],
+  incomeCalculator: {
+    initialDeposit: 10000,
+    interestRate: 5,
+    years: 10,
+    compounding: "monthly",
+    contributionAmount: 0,
+    contributionFrequency: "monthly",
+  },
   settings: {
     deposit: 2000,
     interest: 7.5,
@@ -128,6 +136,8 @@ function switchSection(section) {
     updateExpensesSummary();
   } else if (section === "savings-planner") {
     calculateAndDrawSavingsChart();
+  } else if (section === "income-calculator") {
+    updateIncomeCalculation();
   }
 }
 
@@ -136,6 +146,7 @@ function updatePageTitle(section) {
     "loans-compare": "Loans Compare - Financial Manager",
     "expenses-manager": "Expenses Manager - Financial Manager",
     "savings-planner": "Savings Planner - Financial Manager",
+    "income-calculator": "Income Calculator - Financial Manager",
   };
   document.title = sectionTitles[section] || "Financial Manager";
 }
@@ -843,6 +854,317 @@ function importData(event) {
 
   reader.readAsText(file);
   event.target.value = "";
+}
+
+// ============================================
+// INCOME CALCULATOR SECTION
+// ============================================
+function updateIncomeCalculation() {
+  const initialDeposit = parseFloat(document.getElementById("calc-initial-deposit").value) || 0;
+  const interestRate = parseFloat(document.getElementById("calc-interest-rate").value) || 0;
+  const years = parseFloat(document.getElementById("calc-years").value) || 0;
+  const compounding = document.getElementById("calc-compounding").value;
+  const contributionAmount = parseFloat(document.getElementById("calc-contribution-amount").value) || 0;
+  const contributionFrequency = document.getElementById("calc-contribution-frequency").value;
+
+  // Update app state
+  appState.incomeCalculator.initialDeposit = initialDeposit;
+  appState.incomeCalculator.interestRate = interestRate;
+  appState.incomeCalculator.years = years;
+  appState.incomeCalculator.compounding = compounding;
+  appState.incomeCalculator.contributionAmount = contributionAmount;
+  appState.incomeCalculator.contributionFrequency = contributionFrequency;
+
+  // Calculate and display results
+  calculateAndDrawIncomeChart();
+  updateIncomeResultsPanel();
+}
+
+function getCompoundingFrequency(type) {
+  const frequencies = {
+    annually: 1,
+    semiannually: 2,
+    quarterly: 4,
+    monthly: 12,
+    daily: 365,
+  };
+  return frequencies[type] || 12;
+}
+
+function getContributionFrequency(type) {
+  const frequencies = {
+    weekly: 52,
+    monthly: 12,
+    quarterly: 4,
+    yearly: 1,
+  };
+  return frequencies[type] || 12;
+}
+
+function calculateCompoundInterest(principal, rate, years, compoundingFrequency) {
+  const rateDecimal = rate / 100;
+  const finalAmount = principal * Math.pow(1 + rateDecimal / compoundingFrequency, compoundingFrequency * years);
+  const interestEarned = finalAmount - principal;
+  return {
+    finalAmount,
+    interestEarned,
+  };
+}
+
+function calculateCompoundInterestWithContributions(principal, rate, years, compoundingFrequency, contributionAmount, contributionFrequency) {
+  const rateDecimal = rate / 100;
+  const ratePerPeriod = rateDecimal / compoundingFrequency;
+  
+  // Total parameters
+  const totalMonths = years * 12;
+  const monthsPerCompound = 12 / compoundingFrequency;
+  const monthsPerContribution = 12 / getContributionFrequency(contributionFrequency);
+  
+  let balance = principal;
+  let totalContributions = 0;
+  let nextContributionMonth = monthsPerContribution;
+  
+  for (let month = 1; month <= totalMonths; month++) {
+    // Add contribution if we've reached the next contribution time
+    if (contributionAmount > 0 && month >= nextContributionMonth) {
+      balance += contributionAmount;
+      totalContributions += contributionAmount;
+      nextContributionMonth += monthsPerContribution;
+    }
+    
+    // Apply interest at each compounding period
+    if (monthsPerCompound > 0 && month % monthsPerCompound === 0) {
+      balance *= (1 + ratePerPeriod);
+    }
+  }
+  
+  const interestEarned = balance - principal - totalContributions;
+  
+  return {
+    finalAmount: balance,
+    interestEarned: interestEarned,
+    totalContributions: totalContributions,
+  };
+}
+
+function updateIncomeResultsPanel() {
+  const { initialDeposit, interestRate, years, compounding, contributionAmount, contributionFrequency } = appState.incomeCalculator;
+  const compoundingFreq = getCompoundingFrequency(compounding);
+  
+  const results = calculateCompoundInterestWithContributions(
+    initialDeposit, 
+    interestRate, 
+    years, 
+    compoundingFreq, 
+    contributionAmount, 
+    contributionFrequency
+  );
+  
+  const { finalAmount, interestEarned, totalContributions } = results;
+
+  const panel = document.getElementById("income-results-panel");
+  if (!panel) return;
+
+  const totalInvested = initialDeposit + totalContributions;
+  const roi = totalInvested > 0 ? ((interestEarned / totalInvested) * 100).toFixed(2) : 0;
+
+  panel.innerHTML = `
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h3 class="card-title text-teal fw-bold mb-4">Investment Results</h3>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Initial Deposit</h5>
+              <p class="fs-5 fw-bold">${formatCurrency(initialDeposit)}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Interest Rate</h5>
+              <p class="fs-5 fw-bold">${interestRate.toFixed(2)}% per year</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Investment Period</h5>
+              <p class="fs-5 fw-bold">${years.toFixed(1)} years</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Compounding Frequency</h5>
+              <p class="fs-5 fw-bold">${compounding.charAt(0).toUpperCase() + compounding.slice(1)}</p>
+            </div>
+          </div>
+          ${contributionAmount > 0 ? `
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Contribution Amount</h5>
+              <p class="fs-5 fw-bold">${formatCurrency(contributionAmount)} ${contributionFrequency}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Total Contributions</h5>
+              <p class="fs-5 fw-bold text-primary">${formatCurrency(totalContributions)}</p>
+            </div>
+          </div>
+          ` : ''}
+          <hr class="my-3">
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Interest Earned</h5>
+              <p class="fs-4 fw-bold text-success">${formatCurrency(interestEarned)}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Final Amount</h5>
+              <p class="fs-4 fw-bold text-teal">${formatCurrency(finalAmount)}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Total Invested</h5>
+              <p class="fs-5 fw-bold">${formatCurrency(totalInvested)}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="results-item">
+              <h5 class="text-muted">Return on Investment (ROI)</h5>
+              <p class="fs-5 fw-bold text-info">${roi}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function calculateAndDrawIncomeChart() {
+  if (currentSection !== "income-calculator") return;
+
+  const { initialDeposit, interestRate, years, compounding, contributionAmount, contributionFrequency } = appState.incomeCalculator;
+  const compoundingFreq = getCompoundingFrequency(compounding);
+  const rateDecimal = interestRate / 100;
+  const ratePerPeriod = rateDecimal / compoundingFreq;
+
+  // Generate data points for the chart
+  const labels = [];
+  const balanceData = [];
+  const interestData = [];
+
+  const totalMonths = Math.round(years * 12);
+  const monthsPerCompound = 12 / compoundingFreq;
+  const monthsPerContribution = 12 / getContributionFrequency(contributionFrequency);
+  
+  let balance = initialDeposit;
+  let totalContributions = 0;
+  let nextContributionMonth = monthsPerContribution;
+
+  // Record initial state
+  labels.push("0.0 yrs");
+  balanceData.push(initialDeposit);
+  interestData.push(0);
+
+  for (let month = 1; month <= totalMonths; month++) {
+    // Add contribution if we've reached the next contribution time
+    if (contributionAmount > 0 && month >= nextContributionMonth) {
+      balance += contributionAmount;
+      totalContributions += contributionAmount;
+      nextContributionMonth += monthsPerContribution;
+    }
+    
+    // Apply interest at each compounding period
+    if (monthsPerCompound > 0 && month % monthsPerCompound === 0) {
+      balance *= (1 + ratePerPeriod);
+    }
+    
+    // Record data points monthly
+    if (month % Math.max(1, Math.floor(monthsPerCompound)) === 0) {
+      const yearsPassed = month / 12;
+      const interest = balance - initialDeposit - totalContributions;
+      
+      labels.push(yearsPassed.toFixed(1) + " yrs");
+      balanceData.push(Math.round(balance * 100) / 100);
+      interestData.push(Math.round(interest * 100) / 100);
+    }
+  }
+
+  // Ensure final data point is recorded
+  const yearsPassed = totalMonths / 12;
+  const finalInterest = balance - initialDeposit - totalContributions;
+  if (labels[labels.length - 1] !== yearsPassed.toFixed(1) + " yrs") {
+    labels.push(yearsPassed.toFixed(1) + " yrs");
+    balanceData.push(Math.round(balance * 100) / 100);
+    interestData.push(Math.round(finalInterest * 100) / 100);
+  }
+
+  // Draw chart
+  drawIncomeChart(labels, balanceData, interestData);
+}
+
+function drawIncomeChart(labels, balanceData, interestData) {
+  const ctx = document.getElementById("incomeChart");
+  if (!ctx) return;
+
+  if (window.incomeChartInstance) {
+    window.incomeChartInstance.destroy();
+  }
+
+  window.incomeChartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Total Balance",
+          data: balanceData,
+          borderColor: "#20c997",
+          backgroundColor: "rgba(32, 201, 151, 0.1)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1,
+          pointRadius: 0,
+        },
+        {
+          label: "Interest Earned",
+          data: interestData,
+          borderColor: "#198754",
+          backgroundColor: "rgba(25, 135, 84, 0.1)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: "Savings Growth Over Time",
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return formatCurrency(value);
+            },
+          },
+        },
+      },
+    },
+  });
 }
 
 // ============================================
